@@ -4,7 +4,7 @@ const timestamp = {
   }
 };
 const build = [
-  "/stage-striker/_app/start-655c0284.js",
+  "/stage-striker/_app/start-4430de34.js",
   "/stage-striker/_app/pages/__layout.svelte-39d525e5.js",
   "/stage-striker/_app/assets/pages/__layout.svelte-97f85b99.css",
   "/stage-striker/_app/error.svelte-376ead2b.js",
