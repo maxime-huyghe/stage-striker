@@ -1,0 +1,17 @@
+{
+    "short_name": "stage-striker",
+    "name": "stage-striker",
+    "start_url": "/stage-striker",
+    "icons": [
+      {
+        "src": "favicon.png",
+        "type": "image/png",
+        "sizes": "128x128"
+      }
+    ],
+    "background_color": "#FFFFFF",
+    "display": "minimal-ui",
+    "scope": "/stage-striker/",
+    "theme_color": "#FFFFFF",
+    "description": "A simple app to pick and ban stages for competitive Super Smash Bros. Ultimate sets."
+}
