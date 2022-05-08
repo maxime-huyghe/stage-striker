@@ -4,12 +4,18 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="/stage-striker/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="manifest" href="/stage-striker/manifest.json" />
 		<meta http-equiv="content-security-policy" content="">
-	<link rel="stylesheet" href="/stage-striker/_app/assets/pages/__layout.svelte-4497d3ec.css">
-	<link rel="modulepreload" href="/stage-striker/_app/start-38678d0f.js">
+	<link rel="stylesheet" href="/stage-striker/_app/assets/pages/__layout.svelte-97f85b99.css">
+	<link rel="modulepreload" href="/stage-striker/_app/start-c2881ce6.js">
 	<link rel="modulepreload" href="/stage-striker/_app/chunks/index-6a88b587.js">
 	<link rel="modulepreload" href="/stage-striker/_app/pages/__layout.svelte-39d525e5.js">
 	<link rel="modulepreload" href="/stage-striker/_app/pages/index.svelte-13d9b5be.js">
+				<script>
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.register('/stage-striker/service-worker.js');
+		}
+	</script>
 	</head>
 	<body>
 		<div>
@@ -24,7 +30,7 @@
 
 
 		<script type="module" data-hydrate="xmu930">
-		import { start } from "/stage-striker/_app/start-38678d0f.js";
+		import { start } from "/stage-striker/_app/start-c2881ce6.js";
 		start({
 			target: document.querySelector('[data-hydrate="xmu930"]').parentNode,
 			paths: {"base":"/stage-striker","assets":"/stage-striker"},
