@@ -1,10 +1,5 @@
-const timestamp = {
-  toString: () => {
-    throw new Error("`timestamp` has been removed from $service-worker. Use `version` instead");
-  }
-};
 const build = [
-  "/stage-striker/_app/start-4430de34.js",
+  "/stage-striker/_app/start-69070002.js",
   "/stage-striker/_app/pages/__layout.svelte-39d525e5.js",
   "/stage-striker/_app/assets/pages/__layout.svelte-97f85b99.css",
   "/stage-striker/_app/error.svelte-376ead2b.js",
@@ -27,12 +22,10 @@ const files = [
   "/stage-striker/images/yoshis_story.jpg",
   "/stage-striker/manifest.json"
 ];
-const prerendered = [
-  "/stage-striker"
-];
+const version = "1652087453971";
 const worker = self;
-const FILES = `cache${timestamp}`;
-const to_cache = build.concat(files).concat(prerendered);
+const FILES = `cache${version}`;
+const to_cache = build.concat(files);
 const staticAssets = new Set(to_cache);
 worker.addEventListener("install", (event) => {
   event.waitUntil(caches.open(FILES).then((cache) => cache.addAll(to_cache)).then(() => {
@@ -49,7 +42,7 @@ worker.addEventListener("activate", (event) => {
   }));
 });
 async function fetchAndCache(request) {
-  const cache = await caches.open(`offline${timestamp}`);
+  const cache = await caches.open(`offline${version}`);
   try {
     const response = await fetch(request);
     cache.put(request, response.clone());
