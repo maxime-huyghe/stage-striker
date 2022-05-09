@@ -1,9 +1,9 @@
 const build = [
-  "/stage-striker/_app/start-1a9a0e88.js",
+  "/stage-striker/_app/start-19d16c85.js",
   "/stage-striker/_app/pages/__layout.svelte-39d525e5.js",
-  "/stage-striker/_app/assets/pages/__layout.svelte-ff9b4b11.css",
+  "/stage-striker/_app/assets/pages/__layout.svelte-1ae5e47f.css",
   "/stage-striker/_app/error.svelte-376ead2b.js",
-  "/stage-striker/_app/pages/index.svelte-a900ae20.js",
+  "/stage-striker/_app/pages/index.svelte-e95a772e.js",
   "/stage-striker/_app/chunks/index-6a88b587.js"
 ];
 const files = [
@@ -22,7 +22,7 @@ const files = [
   "/stage-striker/images/yoshis_story.jpg",
   "/stage-striker/manifest.json"
 ];
-const version = "1652094826875";
+const version = "1652095013560";
 const worker = self;
 const FILES = `cache${version}`;
 const to_cache = build.concat(files);
