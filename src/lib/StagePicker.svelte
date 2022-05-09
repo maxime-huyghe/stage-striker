@@ -59,7 +59,7 @@
   $: currentPlayer = turns.length && (turns[0].player === "winner" ? lastWinner : lastLoser);
 </script>
 
-<div class="text-2xl">
+<div class="text-2xl pb-2">
   {#if turns.length}
     {#if gentlemans}
       Player {currentPlayer}, pick {turns[0].num} gentleman's stage{turns[0].num > 1 ? "s" : ""}.

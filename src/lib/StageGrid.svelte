@@ -11,7 +11,7 @@
   }
 </script>
 
-<div class="grid grid-cols-3">
+<div class="grid grid-cols-2 lg:grid-cols-3">
   {#each stages as stageId}
     <Stage
       stage={LEGAL_STAGES_DATA[stageId]}

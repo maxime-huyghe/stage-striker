@@ -10,7 +10,7 @@
   export let onClick: () => void = () => {};
 </script>
 
-<div class="m-2 relative" on:click={onClick}>
+<button class="m-2 relative shadow-md" on:click={onClick}>
   <div
     class="absolute z-10 w-full h-full"
     class:bg-black={selected !== "banned"}
@@ -18,11 +18,12 @@
     class:bg-opacity-0={selected === "picked"}
     class:bg-opacity-50={selected === "no"}
     class:bg-opacity-70={selected === "banned"}
-  />
-  <img src={stage.image} alt={stage.name} class="w-52" />
+  >
   <span
     class="absolute z-20 bottom-0 left-0 w-full h-8 text-center text-lg bg-opacity-80 text-white bg-slate-800"
   >
     {stage.name}
   </span>
-</div>
+  </div>
+  <img src={stage.image} alt={stage.name} class="w-64" />
+</button>

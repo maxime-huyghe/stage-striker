@@ -20,5 +20,7 @@
   {/if}
 {/if}
 
+<div class="flex flex-row gap-4">
 <Button on:click={() => dispatch("winner", 1)}>&lt;| Player 1</Button>
 <Button on:click={() => dispatch("winner", 2)}>Player 2 |&gt;</Button>
+</div>
