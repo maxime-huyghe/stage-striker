@@ -5,34 +5,10 @@
 <script lang="ts">
   import BoPicker from "$lib/BoPicker.svelte";
   import StagePicker from "$lib/StagePicker.svelte";
-
   import { GENTLEMAN_STAGES, NORMAL_STAGES } from "$lib/stages";
-  import {
-    GENTLEMAN_TURNS,
-    type Player,
-    type SelectionResult,
-    type Turn,
-  } from "$lib/stageSelection";
+  import { GENTLEMAN_TURNS, type Player, type SelectionResult } from "$lib/stageSelection";
+  import type { Phase } from "$lib/stageStriker";
   import WinnerPicker from "$lib/WinnerPicker.svelte";
-
-  type Phase =
-    | { name: "pickBO" }
-    | {
-        name: "gentleman";
-        turns: Turn[];
-      }
-    | { name: "rps" }
-    | {
-        name: "pickWinner";
-      }
-    | {
-        name: "firstPickBan";
-        turns: Turn[];
-      }
-    | {
-        name: "restOfPickBansAndWinnerPicks";
-        turns: Turn[];
-      };
 
   let phases: Phase[] = [
     { name: "pickBO" },
@@ -57,6 +33,7 @@
       ],
     },
   ];
+
   let bestOf: number;
   let gentlemanStages: string[] = [];
   let lastChosenStage: string;
@@ -103,6 +80,10 @@
     advanceToNextPhase();
   }
 </script>
+
+<svelte:head>
+  <title>Stage Striker</title>
+</svelte:head>
 
 <main class="flex flex-col items-center">
   {#if phases && !someoneWon}
