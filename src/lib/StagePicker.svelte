@@ -35,8 +35,11 @@
 
   $: everySelectedStage = selectedStagesByTurn.reduce((x, y) => new Map([...x].concat([...y])));
 
+  let waitingForConfirmation: boolean = false;
+
   function onStageClick(stageId: string): void {
     if (!turns.length) return;
+    waitingForConfirmation = false;
     const turn = turns[0];
     /** Selected stages for this turn */
     const selectedStagesThisTurn = selectedStagesByTurn[0];
@@ -51,10 +54,17 @@
     }
     selectedStagesByTurn = selectedStagesByTurn;
     if (selectedStagesThisTurn.size === turn.num) {
-      turns = turns.slice(1);
-      selectedStagesByTurn = [new Map(), ...selectedStagesByTurn];
+      waitingForConfirmation = true;
     }
   }
+
+  /** Called at the end of a turn when a player confirmed their selection. */
+  function playerConfirmed(): void {
+    waitingForConfirmation = false;
+    turns = turns.slice(1);
+    selectedStagesByTurn = [new Map(), ...selectedStagesByTurn];
+  }
+
   $: lastLoser = lastWinner === 1 ? 2 : 1;
   $: currentPlayer = turns.length && (turns[0].player === "winner" ? lastWinner : lastLoser);
 </script>
@@ -62,9 +72,9 @@
 <div class="text-2xl pb-2">
   {#if turns.length}
     {#if gentlemans}
-      Player {currentPlayer}, pick {turns[0].num} gentleman's stage{turns[0].num > 1 ? "s" : ""}.
+      Player {currentPlayer}, pick {turns[0].num} gentleman's stage{turns[0].num > 1 ? "s" : ""}:
     {:else}
-      Player {currentPlayer}, {turns[0].ty} {turns[0].num} stage{turns[0].num > 1 ? "s" : ""}.
+      Player {currentPlayer}, {turns[0].ty} {turns[0].num} stage{turns[0].num > 1 ? "s" : ""}:
     {/if}
   {:else}
     Please proceed to the next phase.
@@ -73,4 +83,13 @@
 
 <StageGrid {stages} selectedStages={everySelectedStage} {onStageClick} />
 
-<Button hidden={turns.length > 0} on:click={next}>Next</Button>
+{#if waitingForConfirmation}
+  <span class="text-2xl pt-2">
+    Player {currentPlayer}, confirm your selection:
+  </span>
+  <Button on:click={playerConfirmed}>Confirm</Button>
+{/if}
+
+{#if !turns.length}
+  <Button on:click={next}>Next</Button>
+{/if}
