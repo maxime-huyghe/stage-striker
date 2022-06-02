@@ -1,5 +1,4 @@
-import { dev } from "$app/env";
-import type { Unionize } from "./utils";
+import type { SingleUnionVariant, Unionize } from "./utils";
 
 export type SelectionResult = {
   picked: string[];
@@ -61,15 +60,37 @@ const DEFAULT_RULESET_FIRST_PICK_BAN = 3;
 const DEFAULT_RULESET_PICK_WINNER = 4;
 const DEFAULT_RULESET_REST_OF_PICK_BANS_AND_WINNER_PICKS = 5;
 
-// export function buildRuleset(normalStages: string[], gentlemanStages: string[]): Phase[] {}
+export type PhasesStartingWith<V extends keyof PhaseOptions> = [
+  SingleUnionVariant<PhaseOptions, V>,
+  ...Phase[],
+];
 
 /**
  * Parses a ruleset string into an array of phases.
+ * @param phaseVariant the phase variant to check for
  * @param ruleset the ruleset string to be parsed
- * @throws {Error} if the ruleset string is invalid
+ * @throws {Error} if the ruleset string is invalid or the variant is wrong
  * @returns a list of phases corresponding to the ruleset
  */
-export function parsePhases(ruleset: string): Phase[] {
+export function parsePhasesAndCheckPhase<V extends keyof PhaseOptions>(
+  phaseVariant: V,
+  ruleset: string,
+): PhasesStartingWith<V> {
+  const phases = parsePhases(ruleset);
+  if (!phases.length) {
+    throw new Error("malformed ruleset: no phases");
+  }
+  const [firstPhase, ...rest] = phases;
+  if (firstPhase.type !== phaseVariant) {
+    throw new Error(
+      `malformed ruleset: missing ${phaseVariant} phase in position 0 (got ${firstPhase.type})`,
+    );
+  }
+  const theCompilerNeedsSomeHelp = firstPhase as SingleUnionVariant<PhaseOptions, V>;
+  return [theCompilerNeedsSomeHelp, ...rest];
+}
+
+function parsePhases(ruleset: string): Phase[] {
   const array: unknown[] = JSON.parse(ruleset);
   if (!Array.isArray(array)) {
     throw new Error("malformed ruleset: should be an array");
