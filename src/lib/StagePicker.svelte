@@ -48,7 +48,7 @@
       !everySelectedStage.has(stageId) &&
       !selectedStagesThisTurn.has(stageId)
     ) {
-      selectedStagesThisTurn.set(stageId, turn.ty === "pick" ? "picked" : "banned");
+      selectedStagesThisTurn.set(stageId, turn.type === "pick" ? "picked" : "banned");
     } else if (selectedStagesThisTurn.has(stageId)) {
       selectedStagesThisTurn.delete(stageId);
     }
@@ -74,7 +74,7 @@
     {#if gentlemans}
       Player {currentPlayer}, pick {turns[0].num} gentleman's stage{turns[0].num > 1 ? "s" : ""}:
     {:else}
-      Player {currentPlayer}, {turns[0].ty} {turns[0].num} stage{turns[0].num > 1 ? "s" : ""}:
+      Player {currentPlayer}, {turns[0].type} {turns[0].num} stage{turns[0].num > 1 ? "s" : ""}:
     {/if}
   {:else}
     Please proceed to the next phase.

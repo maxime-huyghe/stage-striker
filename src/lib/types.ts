@@ -1,4 +1,16 @@
-import type { SingleUnionVariant, Unionize } from "./utils";
+import {
+  array,
+  assert,
+  enums,
+  literal,
+  min,
+  nonempty,
+  number,
+  object,
+  union,
+  type Describe,
+  type Infer,
+} from "superstruct";
 
 export type SelectionResult = {
   picked: string[];
@@ -10,24 +22,9 @@ export const GENTLEMAN_TURNS: Readonly<Turn[]> = [
   { type: "pick", num: 1, player: "loser" },
 ];
 
-export type Player = 1 | 2;
+export const Player = enums([1, 2]);
 
-export type Turn = {
-  type: "ban" | "pick";
-  num: number;
-  player: "winner" | "loser";
-};
-
-type PhaseOptions = {
-  pickBO: unknown;
-  gentleman: { turns: Turn[] };
-  rps: unknown;
-  pickWinner: unknown;
-  firstPickBan: { turns: Turn[] };
-  restOfPickBansAndWinnerPicks: { turns: Turn[] };
-};
-
-export type Phase = Unionize<PhaseOptions>;
+export type Player = Infer<typeof Player>;
 
 export const DEFAULT_RULESET: Readonly<Phase[]> = [
   { type: "pickBO" },
@@ -53,17 +50,40 @@ export const DEFAULT_RULESET: Readonly<Phase[]> = [
   },
 ];
 
-export const DEFAULT_RULESET_PICK_BO = 0;
-const DEFAULT_RULESET_GENTLEMAN = 1;
-const DEFAULT_RULESET_RPS = 2;
-const DEFAULT_RULESET_FIRST_PICK_BAN = 3;
-const DEFAULT_RULESET_PICK_WINNER = 4;
-const DEFAULT_RULESET_REST_OF_PICK_BANS_AND_WINNER_PICKS = 5;
+const Turn = object({
+  type: union([literal("ban"), literal("pick")]),
+  num: min(number(), 1),
+  player: union([literal("winner"), literal("loser")]),
+});
 
-export type PhasesStartingWith<V extends keyof PhaseOptions> = [
-  SingleUnionVariant<PhaseOptions, V>,
-  ...Phase[],
-];
+export type Turn = Infer<typeof Turn>;
+
+const Phase = union([
+  object({ type: literal("pickBO") }),
+  object({ type: literal("gentleman"), turns: array(Turn) }),
+  object({ type: literal("rps") }),
+  object({ type: literal("pickWinner") }),
+  object({ type: literal("firstPickBan"), turns: array(Turn) }),
+  object({ type: literal("restOfPickBansAndWinnerPicks"), turns: array(Turn) }),
+]);
+
+export type Phase = Infer<typeof Phase>;
+
+const Phases = nonempty(array(Phase));
+
+export type Phases = Infer<typeof Phases>;
+
+export type PhaseVariant = Phase["type"];
+
+// Easier to do it this way.
+export const PhaseVariant: Describe<PhaseVariant> = enums([
+  "pickBO",
+  "gentleman",
+  "rps",
+  "pickWinner",
+  "firstPickBan",
+  "restOfPickBansAndWinnerPicks",
+]);
 
 /**
  * Parses a ruleset string into an array of phases.
@@ -72,104 +92,14 @@ export type PhasesStartingWith<V extends keyof PhaseOptions> = [
  * @throws {Error} if the ruleset string is invalid or the variant is wrong
  * @returns a list of phases corresponding to the ruleset
  */
-export function parsePhasesAndCheckPhase<V extends keyof PhaseOptions>(
-  phaseVariant: V,
-  ruleset: string,
-): PhasesStartingWith<V> {
-  const phases = parsePhases(ruleset);
-  if (!phases.length) {
-    throw new Error("malformed ruleset: no phases");
-  }
-  const [firstPhase, ...rest] = phases;
+export function parsePhasesAndCheckPhase(phaseVariant: PhaseVariant, ruleset: string): Phase[] {
+  const phases: unknown = JSON.parse(ruleset);
+  assert(phases, Phases);
+  const [firstPhase] = phases;
   if (firstPhase.type !== phaseVariant) {
     throw new Error(
       `malformed ruleset: missing ${phaseVariant} phase in position 0 (got ${firstPhase.type})`,
     );
   }
-  const theCompilerNeedsSomeHelp = firstPhase as SingleUnionVariant<PhaseOptions, V>;
-  return [theCompilerNeedsSomeHelp, ...rest];
-}
-
-function parsePhases(ruleset: string): Phase[] {
-  const array: unknown[] = JSON.parse(ruleset);
-  if (!Array.isArray(array)) {
-    throw new Error("malformed ruleset: should be an array");
-  }
-
-  for (const idx in array) {
-    const phase: unknown = array[idx];
-    if (!phase || typeof phase !== "object") {
-      throw new Error(
-        `malformed ruleset: should be an array of objects, found something else in position ${idx}`,
-      );
-    }
-    if (!isPhaseWithType(phase)) {
-      throw new Error(`malformed ruleset: missing name in phase ${idx}`);
-    }
-    switch (phase.type) {
-      case "pickBO":
-      case "rps":
-      case "pickWinner":
-        break;
-
-      case "gentleman":
-      case "firstPickBan":
-      case "restOfPickBansAndWinnerPicks":
-        if (!isPhaseWithTurns(phase)) {
-          throw new Error(`malformed ruleset: missing turns in phase ${idx} (${phase.type})`);
-        }
-        try {
-          parseTurns(phase.turns);
-        } catch (e) {
-          throw new Error(`malformed ruleset: invalid turns in phase ${idx} (${phase.type}): ${e}`);
-        }
-        break;
-
-      default:
-        throw new Error(`malformed ruleset: unknown phase ${phase.type} at position ${idx}`);
-    }
-  }
-
-  return array;
-}
-
-function isPhaseWithType(phase: object): phase is { type: keyof PhaseOptions } {
-  return "type" in phase;
-}
-
-function isPhaseWithTurns(phase: {
-  type: keyof PhaseOptions;
-}): phase is { type: keyof PhaseOptions; turns: unknown } {
-  return "turns" in phase;
-}
-
-function parseTurns(turns: unknown): Turn[] {
-  if (!Array.isArray(turns)) {
-    throw new Error("malformed turns: should be an array");
-  }
-
-  for (const idx in turns) {
-    const turn: unknown = turns[idx];
-    if (!turn || typeof turn !== "object") {
-      throw new Error(
-        `malformed turns: should be an array of objects, found something else in position ${idx}`,
-      );
-    }
-    if (!isTurnWithType(turn)) {
-      throw new Error(`malformed turn: at ${idx}`);
-    }
-  }
-
-  return turns as Turn[];
-}
-
-function isTurnWithType(turn: any): turn is Turn {
-  return (
-    "type" in turn &&
-    (turn.type === "ban" || turn.type === "pick") &&
-    "num" in turn &&
-    typeof turn.num === "number" &&
-    "player" in turn &&
-    (turn.player === "winner" || turn.player === "loser")
-  );
+  return phases;
 }
