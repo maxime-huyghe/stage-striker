@@ -58,7 +58,7 @@ const Turn = object({
 
 export type Turn = Infer<typeof Turn>;
 
-const Phase = union([
+export const Phase = union([
   object({ type: literal("pickBO") }),
   object({ type: literal("gentleman"), turns: array(Turn) }),
   object({ type: literal("rps") }),
@@ -69,7 +69,7 @@ const Phase = union([
 
 export type Phase = Infer<typeof Phase>;
 
-const Phases = nonempty(array(Phase));
+export const Phases = nonempty(array(Phase));
 
 export type Phases = Infer<typeof Phases>;
 

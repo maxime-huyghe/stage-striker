@@ -3,12 +3,12 @@
 
   import Button from "./Button.svelte";
   import StageGrid from "./StageGrid.svelte";
-  import type { Player, SelectionResult, Turn } from "./stageSelection";
   import type { StageSelected } from "./stages";
+  import type { Player, SelectionResult, Turn } from "./types";
 
   export let stages: Readonly<string[]>;
   export let gentlemans: boolean = false;
-  export let lastWinner: Player;
+  export let firstToPick: Player = 1;
   export let turns: Turn[];
 
   if (turns.length === 0) {
@@ -65,8 +65,8 @@
     selectedStagesByTurn = [new Map(), ...selectedStagesByTurn];
   }
 
-  $: lastLoser = lastWinner === 1 ? 2 : 1;
-  $: currentPlayer = turns.length && (turns[0].player === "winner" ? lastWinner : lastLoser);
+  $: lastLoser = firstToPick === 1 ? 2 : 1;
+  $: currentPlayer = turns.length && (turns[0].player === "winner" ? firstToPick : lastLoser);
 </script>
 
 <div class="text-2xl pb-2">

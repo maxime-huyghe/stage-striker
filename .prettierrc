@@ -1,6 +1,7 @@
 {
-  "semi": true,
-  "trailingComma": "all",
+  "arrowParens": "avoid",
   "printWidth": 100,
-  "quoteProps": "as-needed"
+  "quoteProps": "as-needed",
+  "semi": true,
+  "trailingComma": "all"
 }
