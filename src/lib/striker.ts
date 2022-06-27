@@ -1,10 +1,11 @@
+import { goto } from "$app/navigation";
 import { array, assert, number, object, optional, string, type Infer } from "superstruct";
 import { derived, get, writable, type Writable } from "svelte/store";
 import { GENTLEMAN_STAGES } from "./stages";
 import { DEFAULT_RULESET, Phases, Player, type SelectionResult } from "./types";
-import { base64Decode } from "./utils";
+import { base64Decode, base64Encode } from "./utils";
 
-export const AppState = object({
+export const Striker = object({
   phases: Phases,
   bestOf: optional(number()),
   gentlemanStages: array(string()),
@@ -13,10 +14,10 @@ export const AppState = object({
   rpsWinner: optional(Player),
 });
 
-export type AppState = Infer<typeof AppState>;
+export type Striker = Infer<typeof Striker>;
 
 function createStrikerState() {
-  const { subscribe, set, update }: Writable<AppState> = writable({
+  const store: Writable<Striker> = writable({
     phases: [...DEFAULT_RULESET],
     bestOf: undefined,
     gentlemanStages: [...GENTLEMAN_STAGES],
@@ -25,13 +26,19 @@ function createStrikerState() {
     rpsWinner: undefined,
   });
 
+  const update = (fun: (as: Striker) => Striker) => {
+    const newState = fun(get(store));
+    store.set(newState);
+    goto(`${base64Encode(JSON.stringify(newState))}`);
+  };
+
   return {
-    subscribe,
+    subscribe: store.subscribe,
     setFromBase64: (b64: string) => {
       const json = base64Decode(b64);
       const object: unknown = JSON.parse(json);
-      assert(object, AppState);
-      set(object);
+      assert(object, Striker);
+      store.set(object);
     },
     pickedBo: (bo: number) => update(s => advanceToNextPhase(s, { bestOf: bo })),
     pickedWinner: (winner: Player) =>
@@ -47,10 +54,10 @@ function createStrikerState() {
 export const striker = createStrikerState();
 
 function advanceToNextPhase(
-  current: AppState,
-  newProperties: Partial<Omit<AppState, "phases">>,
+  current: Striker,
+  newProperties: Partial<Omit<Striker, "phases">>,
   newPhases?: Phases,
-): AppState {
+): Striker {
   let { phases } = current;
   if (phases[0].type === "restOfPickBansAndWinnerPicks" && !get(someoneWon)) {
     phases = [{ type: "pickWinner" }, ...phases];
